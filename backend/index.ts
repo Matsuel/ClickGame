@@ -12,13 +12,7 @@ app.use(cors());
 const logger = new Logger('index.ts');
 logger.info('Server is starting...');
 
-const db = Database.getInstance();
-db.connect().then(() => {
-    logger.info('Database connected successfully');
-}).catch((error) => {
-    logger.error(error);
-});
-
+Database.getInstance().connect();
 
 const server = createServer(app);
 const io = new Server(server, {
