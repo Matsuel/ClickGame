@@ -6,9 +6,9 @@ export class Logger {
     private logLevel: number = 0;
     private logClassName: string = '';
 
-    constructor(logLevel: LogLevel = LogLevel.DEBUG) {
+    constructor(logClassName: string, logLevel: LogLevel = LogLevel.DEBUG) {
         this.setLogLevel(logLevel);
-        this.logClassName = this.getCallerFileName();
+        this.logClassName = logClassName;
     }
 
     public setLogLevel(logLevel: LogLevel): void {
@@ -24,37 +24,28 @@ export class Logger {
         return LogLevelValues[level] >= this.logLevel;
     }
 
-    public log(color: string, level: LogLevel, message: string[]): void {
+    public log(color: string, level: LogLevel, message: unknown[]): void {
         if (!this.canLog(level)) return;
         this.logFunction(color + `[${level}] ${this.getNowDate()} [${this.logClassName}] : ${message.join(' ')}` + LogLevelColors.END);
     }
 
-    public info(...message: string[]): void {
+    public info(...message: unknown[]): void {
         if (!this.canLog(LogLevel.INFO)) return;
         this.log(LogLevelColors.INFO, LogLevel.INFO, message);
     }
 
-    public debug(...message: string[]): void {
+    public debug(...message: unknown[]): void {
         if (!this.canLog(LogLevel.DEBUG)) return;
         this.log(LogLevelColors.DEBUG, LogLevel.DEBUG, message);
     }
 
-    public warn(...message: string[]): void {
+    public warn(...message: unknown[]): void {
         if (!this.canLog(LogLevel.WARN)) return;
         this.log(LogLevelColors.WARN, LogLevel.WARN, message);
     }
 
-    public error(...message: string[]): void {
+    public error(...message: unknown[]): void {
         if (!this.canLog(LogLevel.ERROR)) return;
         this.log(LogLevelColors.ERROR, LogLevel.ERROR, message);
-    }
-
-    private getCallerFileName(): string {
-        const error = new Error();
-        const stackLines = error.stack?.split('\n') || [];
-        const rootDir = path.resolve(__dirname, '..', '..');
-        const callerLine = (stackLines.find(line => !line.includes('Logger.ts') && line.includes(rootDir)) || '').split('at ')[1].trim();
-        const callerFilePath = callerLine.replace(rootDir, '').split(':')[0].trim();
-        return callerFilePath.replaceAll(/\\/g, '/');
     }
 }

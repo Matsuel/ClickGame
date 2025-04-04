@@ -3,13 +3,22 @@ import { Server } from 'socket.io';
 import express from 'express';
 import cors from 'cors';
 import { Logger } from './utils/Logger';
+import { Database } from './objects/Database';
 
 const app = express();
 app.use(express.json());
 app.use(cors());
 
-const logger = new Logger();
+const logger = new Logger('index.ts');
 logger.info('Server is starting...');
+
+const db = Database.getInstance();
+db.connect().then(() => {
+    logger.info('Database connected successfully');
+}).catch((error) => {
+    logger.error(error);
+});
+
 
 const server = createServer(app);
 const io = new Server(server, {
@@ -30,5 +39,5 @@ io.on('connection', (socket) => {
 })
 
 server.listen(PORT, () => {
-    console.log(`Server is running on http://${HOST}:${PORT}`);
+    logger.info(`Server is running on http://${HOST}:${PORT}`);
 })
