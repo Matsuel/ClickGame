@@ -9,6 +9,9 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
+let left = 0;
+let right = 0;
+
 const logger = new Logger('index.ts');
 logger.info('Server is starting...');
 
@@ -22,11 +25,21 @@ const io = new Server(server, {
     },
 });
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3002;
 const HOST = process.env.HOST || 'localhost';
 
 io.on('connection', (socket) => {
     console.log('a user connected');
+    socket.join('game');
+    socket.emit('sync', { left, right });
+    socket.on('left', () => {
+        left++;
+        io.to('game').emit('left', { left });
+    });
+    socket.on('right', () => {
+        right++;
+        io.to('game').emit('right', { right });
+    })
     socket.on('disconnect', () => {
         console.log('user disconnected');
     });
